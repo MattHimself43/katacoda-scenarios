@@ -76,9 +76,9 @@ export function Badge({ children, tone = 'neutral' }: { children: ReactNode; ton
 }
 
 export function statusTone(status: string): Tone {
-  if (['PENDING', 'PENDING_BRAND_APPROVAL', 'PENDING_EMAIL_APPROVAL'].includes(status)) return 'amber';
-  if (['APPROVED', 'EXECUTED', 'ACTIVE'].includes(status)) return 'green';
-  if (['REJECTED', 'DECLINED', 'FAILED'].includes(status)) return 'red';
+  if (['PENDING', 'PENDING_BRAND_APPROVAL', 'PENDING_EMAIL_APPROVAL', 'POSSIBLE_DUPLICATE', 'STARTED'].includes(status)) return 'amber';
+  if (['APPROVED', 'EXECUTED', 'ACTIVE', 'APPROVED_FOR_OUTREACH', 'NEW', 'IMPORTED'].includes(status)) return 'green';
+  if (['REJECTED', 'DECLINED', 'FAILED', 'INVALID'].includes(status)) return 'red';
   return 'neutral';
 }
 

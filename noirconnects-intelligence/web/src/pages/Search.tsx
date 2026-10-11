@@ -1,7 +1,7 @@
-import { useSearchParams } from 'react-router-dom';
-import { Badge, Card, CardHeader, EmptyState, ErrorBanner, PageHeader, Spinner } from '../components/ui';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Badge, Card, CardHeader, EmptyState, ErrorBanner, PageHeader, Spinner, statusTone } from '../components/ui';
+import { brandStatusLabel } from '../lib/brands';
 import { useApi } from '../lib/useApi';
-import { humanize } from '../lib/format';
 
 interface Results {
   query: string;
@@ -27,12 +27,14 @@ export function SearchPage() {
             ) : (
               <ul className="divide-y divide-line">
                 {data.brands.map((b) => (
-                  <li key={b.id} className="flex items-center justify-between gap-3 px-5 py-3 text-sm">
+                  <li key={b.id}>
+                    <Link to={`/brands/${b.id}`} className="flex items-center justify-between gap-3 px-5 py-3 text-sm hover:bg-neutral-50">
                     <div className="min-w-0">
                       <p className="truncate font-medium">{b.name}</p>
                       <p className="truncate text-xs text-mute">{b.website_domain} · {b.discovery_niche}</p>
                     </div>
-                    <Badge>{humanize(b.status.toLowerCase())}</Badge>
+                    <Badge tone={statusTone(b.status)}>{brandStatusLabel(b.status)}</Badge>
+                    </Link>
                   </li>
                 ))}
               </ul>

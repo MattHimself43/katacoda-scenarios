@@ -2,7 +2,7 @@
 
 An approval-first influencer marketing intelligence platform for NoirConnects. The app helps the team discover brands, run outreach, manage replies, source creators and send proposals. Every external communication and every material decision needs explicit approval from a person.
 
-**Build status: Phase 1 of 7 is complete.** See [Phase status](#phase-status) for what works today and what doesn't yet.
+**Build status: Phases 1 and 2 of 7 are complete.** See [Phase status](#phase-status) for what works today and what doesn't yet.
 
 ---
 
@@ -110,6 +110,8 @@ The engine enforces these rules:
 | Propose settings changes | ✓ | ✓ | ✓ | |
 | Propose follow-up policy / time zone changes | ✓ | | | |
 | Approve or reject settings changes | ✓ | | | |
+| Import brand research | ✓ | ✓ | ✓ | |
+| Approve or decline brands | ✓ | ✓ | | |
 | View audit log | ✓ | ✓ | | |
 | Manage users | ✓ | | | |
 | Authorize external email, approve proposals, change integrations *(enforced from Phase 3)* | ✓ | | | |
@@ -173,7 +175,7 @@ This means the Overview counts already come from real tables, even for features 
 - **Audit log viewer.** Filter by action, search text, expand a row for details, and page back through older entries.
 - **Navigation.** A responsive black-and-white dashboard: collapsible sidebar on desktop and a drawer on mobile. Sections from later phases are marked **P2–P6** and say plainly that they aren't active yet. They contain no inert controls.
 
-**Tests:** 49 passing. They cover:
+**Tests:** 49 at the end of Phase 1. They cover:
 
 - authentication, sessions, CSRF and rate limiting
 - unauthorized access attempts for every role
@@ -202,11 +204,95 @@ Nothing yet. Phase 1 runs entirely on your machine. Phase 3 will need Hostinger 
 
 - The login rate limiter keeps its state in memory, which assumes a single process. That's fine for local hosting, but it resets on restart.
 - Hostinger Mail isn't integrated yet (Phase 3), and nothing is shown as connected.
-- No Claude research sync exists. Phase 2 adds a manual, validated JSON/CSV import. Phase 7 will look into whether Claude Pro's supported scheduled features can deliver results to a place the app can read. It will not use the paid API, undocumented endpoints or session scraping.
+- No direct Claude research sync exists. Research is brought in through the validated JSON/CSV import (Phase 2). Phase 7 will look into whether Claude Pro's supported scheduled features can deliver results to a place the app can read. It will not use the paid API, undocumented endpoints or session scraping.
+- **Verification flags come from the researcher.** The app enforces structure (a source URL is required for verified evidence), but it doesn't open the source links itself. Reviewers should click through the evidence before approving.
+- **Domain matching** uses a built-in list of common two-part suffixes (`.co.uk`, `.com.au`, …) rather than the full Public Suffix List. Rare suffixes may be treated as the registrable domain itself.
+- **The quality score** is a transparent heuristic, not a prediction. You can change its threshold (minimum score) and recency window in Settings.
 - There is no job scheduler yet (Phase 4). Approval expiry is checked at decision and execution time, and the `expireDueApprovals()` job is ready to be scheduled.
 
-### Next: Phase 2
+### Phase 2: done
 
-1. Define and document the brand research JSON schema, including source URLs, evidence dates, verification flags and paid-versus-affiliate evidence types.
-2. Build the import interface: schema validation, preview, duplicate detection (normalized domain plus name checks, including declined brands), checks that the configuration version is still valid, and a transactional commit.
-3. Add quality scoring and the Brand Discovery and Brand Approvals screens. APPROVE and DECLINE will record the approver and notes. Approving moves a brand to `APPROVED_FOR_OUTREACH` and authorizes drafting only.
+**Implemented**
+
+- **Research format.** `brand-research/v1` covers JSON, plus a CSV form with one row per piece of evidence. It is documented in [`docs/research/brand-research-v1.md`](docs/research/brand-research-v1.md), alongside synthetic JSON and CSV examples, a Claude prompt template, and a JSON Schema you can download (`GET /api/research/brand-schema`).
+  - Unknown fields are rejected, so invented data such as budgets can't slip in.
+  - Each contact field carries its own `verified` flag.
+  - Evidence marked verified must have a source URL.
+  - Every brand needs at least one sourced piece of evidence.
+  - Future dates are rejected.
+- **Import screen** (Brand Discovery → Import research):
+  1. Upload or paste a file.
+  2. **Preview** it. Nothing is written yet.
+  3. Review each record's outcome, score and warnings.
+  4. Optionally tick any possible duplicates you want imported anyway.
+  5. Confirm. The commit must match the previewed file exactly (checked by hash) and runs in a single transaction.
+  - The same file can't be imported twice.
+  - Failed imports are recorded in run history with their errors.
+- **Duplicate prevention:**
+  - **Domain:** websites are normalized to the registrable domain, which handles `www`, subdomains and two-part suffixes like `.co.uk`. A database uniqueness rule backs this up.
+  - **Within a file:** repeats of the same domain are skipped.
+  - **Same name, different domain:** flagged as a possible duplicate and skipped unless included explicitly.
+  - **Declined brands** are never rediscovered as new leads.
+- **Configuration version check:**
+  - The file must name an existing settings version, and its niche must match that version.
+  - Research produced under an older version needs explicit confirmation, and is tagged with that older version.
+  - Each run keeps an immutable snapshot of its configuration.
+- **Quality score.** The app works out its own 0–100 score with a visible breakdown:
+
+  | Part | Points |
+  |---|---|
+  | Evidence strength | 40 |
+  | Recency | 25 |
+  | Contactability | 15 |
+  | Completeness | 10 |
+  | Niche fit | 10 |
+
+  - Paid sponsorship, ambassador and creator-announcement evidence is clearly separated from open affiliate programs, which score low.
+  - Brands below the minimum quality score setting are not imported.
+- **Brand Approvals queue:**
+  - Pending, Approved and Declined views, sorted by score.
+  - Each card shows evidence badges, contact verification and review warnings.
+  - **Approve** and **Decline** both ask for confirmation and take optional notes.
+  - Each brand has an approval request in the universal engine (managers or admins can decide it), tied to the brand data the reviewer saw. If the data changes afterwards, approval is refused.
+  - **Approve** moves the brand to `APPROVED_FOR_OUTREACH`. It **only authorizes preparing an outreach draft**; nothing is sent or queued.
+  - **Decline** moves the brand to `DECLINED`. It stays searchable.
+  - The approver, time and notes are stored, and the audit log records each decision.
+- **Brand profile page:**
+  - full profile
+  - evidence with type, verification, date and source link
+  - score breakdown
+  - contact details, each labelled verified or unverified
+  - review notes
+  - decision history
+- **Other dashboard changes:**
+  - The **Discovered brands** list has search, status and niche filters, sorting and pagination.
+  - **Run history** shows the outcome of each record.
+  - Global search results now link to brand profiles.
+
+**Tests:** 95 passing, 46 of them new in Phase 2. The new tests cover:
+
+- validation of whole files and of individual records
+- configuration version checks, including outdated versions
+- all duplicate cases, including declined brands and the database-level uniqueness rule
+- the preview/commit hash check and re-import prevention
+- failed-run history and minimum-score exclusion
+- CSV parsing and grouping, and domain normalization
+- the scoring model
+- the documentation examples (both must validate)
+- brand approve and decline, single decision, concurrent decisions and stale data
+- role enforcement, and a check that approval sends or queues nothing
+
+**Browser check:** I ran this flow in a headless browser:
+
+- A researcher uploaded a synthetic file of 8 records: 5 new, 1 repeated in the file, 1 below the minimum score, 1 invalid.
+- They previewed and imported it.
+- A manager approved one brand and declined another.
+- The profile, overview and run history all reflected the decisions.
+- There were no console errors, and the mobile layout had no horizontal overflow.
+
+### Next: Phase 3
+
+1. Read Hostinger's official Mail API and MCP documentation to confirm what authenticated send, inbox read, search and thread retrieval support. Then build a separate server-side mail service with a mock provider for development and tests.
+2. Build the outreach drafting workflow. Approving a brand creates a drafting job. Drafts are generated from verified brand data only. Admins can edit a draft, ask for it to be regenerated, reject it, or save it without sending. Any edit cancels the earlier approval.
+3. Add controlled sending. Before each send, the app re-checks the exact approved content, the suppression list and opt-outs, and that the message hasn't already been sent. Sends are idempotent, every attempt is recorded, and an unclear provider response is flagged for manual reconciliation instead of being retried.
+

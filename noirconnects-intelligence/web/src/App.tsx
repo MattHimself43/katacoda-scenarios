@@ -9,6 +9,9 @@ import { SearchPage } from './pages/Search';
 import { AuditPage } from './pages/Audit';
 import { SettingsPage } from './pages/settings/SettingsPage';
 import { NAV } from './lib/nav';
+import { BrandDiscoveryPage } from './pages/brands/BrandDiscovery';
+import { BrandApprovalsPage } from './pages/brands/BrandApprovals';
+import { BrandProfilePage } from './pages/brands/BrandProfile';
 
 export function App() {
   const { me, loading, can } = useAuth();
@@ -21,6 +24,9 @@ export function App() {
         {NAV.filter((n) => n.phase).map((n) => (
           <Route key={n.path} path={n.path} element={<ComingSoonPage item={n} />} />
         ))}
+        <Route path="/brand-discovery" element={<BrandDiscoveryPage />} />
+        <Route path="/brand-approvals" element={<BrandApprovalsPage />} />
+        <Route path="/brands/:id" element={<BrandProfilePage />} />
         <Route path="/audit" element={can('audit.view') ? <AuditPage /> : <Forbidden />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/search" element={<SearchPage />} />

@@ -17,6 +17,8 @@ const METRICS: { key: keyof Overview['metrics']; label: string; to: string }[] =
   { key: 'dormantOutreach', label: 'Dormant outreach records', to: '/dormant' },
 ];
 
+const STATUS_LABELS: Record<string, string> = { NOT_CONFIGURED: 'Not configured', MANUAL_IMPORT: 'Manual import' };
+
 const INTEGRATION_LABELS = { mail: 'Hostinger Mail', research: 'Claude research sync', scheduler: 'Job scheduler' } as const;
 
 export function OverviewPage() {
@@ -89,7 +91,7 @@ export function OverviewPage() {
                       <p className="text-sm font-medium">{INTEGRATION_LABELS[k]}</p>
                       <p className="mt-0.5 text-xs text-mute">{data.integrations[k].detail}</p>
                     </div>
-                    <Badge>{data.integrations[k].status === 'NOT_CONFIGURED' ? 'Not configured' : data.integrations[k].status}</Badge>
+                    <Badge>{STATUS_LABELS[data.integrations[k].status] ?? data.integrations[k].status}</Badge>
                   </li>
                 ))}
               </ul>

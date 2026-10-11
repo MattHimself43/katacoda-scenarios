@@ -143,3 +143,131 @@ export interface UserRecord {
   created_at: string;
   last_login_at: string | null;
 }
+
+// ─── Phase 2: brands & research imports
+export interface QualityBreakdown {
+  evidence: number;
+  recency: number;
+  contactability: number;
+  completeness: number;
+  nicheFit: number;
+  total: number;
+  notes: string[];
+}
+
+export interface BrandSummary {
+  id: number;
+  name: string;
+  website_url: string;
+  website_domain: string;
+  industry: string | null;
+  subcategory: string | null;
+  quality_score: number | null;
+  status: string;
+  discovery_niche: string;
+  contact_email: string | null;
+  contact_email_verified: number;
+  contact_channel_url: string | null;
+  created_at: string;
+  researched_at: string;
+  settings_version: number;
+  partnership_evidence: number;
+  affiliate_evidence: number;
+  verified_evidence: number;
+  total_evidence: number;
+  warnings: string[];
+}
+
+export interface BrandEvidence {
+  id: number;
+  evidence_type: string;
+  description: string;
+  source_url: string | null;
+  evidence_date: string | null;
+  creator_name: string | null;
+  platform: string | null;
+  verification_status: 'VERIFIED' | 'UNVERIFIED';
+  captured_at: string;
+  research_run_id: number | null;
+}
+
+export interface BrandDetail {
+  brand: BrandSummary & {
+    products_services: string | null;
+    influencer_activity_summary: string | null;
+    recommendation_reason: string | null;
+    contact_name: string | null;
+    contact_name_verified: number;
+    contact_role: string | null;
+    contact_role_verified: number;
+    research_run_id: number | null;
+    target_markets: string[];
+    quality_breakdown: Partial<QualityBreakdown>;
+    updated_at: string;
+  };
+  evidence: BrandEvidence[];
+  decisions: { id: number; decision: string; decided_at: string; notes: string | null; decided_by: string }[];
+  approval: { id: string; status: string; content_hash: string; requested_at: string; requested_by_name: string | null } | null;
+}
+
+export type RecordOutcome = 'NEW' | 'DUPLICATE' | 'DUPLICATE_IN_FILE' | 'POSSIBLE_DUPLICATE' | 'BELOW_THRESHOLD' | 'INVALID';
+
+export interface ImportRecord {
+  index: number;
+  name: string | null;
+  website: string | null;
+  domain: string | null;
+  outcome: RecordOutcome;
+  errors: string[];
+  warnings: string[];
+  score: QualityBreakdown | null;
+  existingBrand: { id: number; name: string; domain: string; status: string } | null;
+  partnershipEvidence: number;
+  affiliateEvidence: number;
+  verifiedEvidence: number;
+  imported?: boolean;
+}
+
+export interface ImportAnalysis {
+  inputHash: string;
+  format: 'JSON' | 'CSV';
+  fileName: string | null;
+  fileErrors: string[];
+  fileWarnings: string[];
+  schemaVersion: string | null;
+  generatedAt: string | null;
+  producedBy: string | null;
+  config: {
+    version: number;
+    niche: string;
+    activeVersion: number;
+    activeNiche: string;
+    outdated: boolean;
+    dailyBrandTarget: number;
+    minBrandQualityScore: number;
+  } | null;
+  summary: Record<RecordOutcome | 'received', number>;
+  records: ImportRecord[];
+  alreadyImported: { runId: number; completedAt: string } | null;
+}
+
+export interface ResearchRunSummary {
+  id: number;
+  run_type: string;
+  source: string;
+  status: string;
+  started_at: string;
+  completed_at: string | null;
+  input_file_name: string | null;
+  input_format: string | null;
+  schema_version: string | null;
+  records_received: number;
+  records_imported: number;
+  records_duplicate: number;
+  records_rejected: number;
+  settings_version: number;
+  started_by_name: string | null;
+  niche: string | null;
+  error_details: string[] | null;
+  warnings: string[];
+}

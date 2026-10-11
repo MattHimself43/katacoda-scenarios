@@ -27,8 +27,8 @@ export interface NavItem {
 
 export const NAV: NavItem[] = [
   { label: 'Overview', path: '/', icon: LayoutGrid, summary: 'Live pipeline counts from the database.' },
-  { label: 'Brand Discovery', path: '/brand-discovery', icon: Search, phase: 2, summary: 'Import validated research results, preview them, and review discovered brands with their sponsorship evidence, quality score and configuration version.' },
-  { label: 'Brand Approvals', path: '/brand-approvals', icon: BadgeCheck, phase: 2, summary: 'Approve or decline each discovered brand. Approval authorizes preparing an outreach draft only — never sending.' },
+  { label: 'Brand Discovery', path: '/brand-discovery', icon: Search, summary: 'Import validated research results, preview them, and review discovered brands with their sponsorship evidence, quality score and configuration version.' },
+  { label: 'Brand Approvals', path: '/brand-approvals', icon: BadgeCheck, summary: 'Approve or decline each discovered brand. Approval authorizes preparing an outreach draft only — never sending.' },
   { label: 'Outreach Management', path: '/outreach', icon: Send, phase: 3, summary: 'Personalized drafts, editing, regeneration requests and exact-content approval before any email is sent through Hostinger Mail.' },
   { label: 'Inbox & Replies', path: '/inbox', icon: Inbox, phase: 4, summary: 'Synchronized replies matched to brands, deterministic classification and manual review of anything ambiguous.' },
   { label: 'Follow-up Queue', path: '/follow-ups', icon: CalendarClock, phase: 4, summary: 'Business-day follow-up schedule. Every follow-up is drafted for approval and rechecked against replies and opt-outs before sending.' },
