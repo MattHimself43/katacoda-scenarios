@@ -18,6 +18,12 @@ The NoirConnects Intelligence app lives in `noirconnects-intelligence/`. Its REA
   - **Never merge into `main` without the owner's approval**, because commits on `main` sync straight into the Lovable editor.
   - Never force-push or rewrite pushed history (see the repo's `AGENTS.md`).
   - Keep every branch building (`bun run build`, `bun run test`, `bun run lint`).
+- **Database changes on Lovable Cloud** (verified in the pilot):
+  - Lovable does not apply migration files pushed from GitHub on its own.
+  - Claude Code writes the SQL, then the owner asks Lovable's chat to "apply `<file>` exactly as written".
+  - Lovable copies the SQL into its own numbered Drizzle migration (`drizzle/migrations/`), applies it, and regenerates `src/integrations/supabase/types.ts`.
+  - Write every migration so it can safely run twice (`IF NOT EXISTS`, `ON CONFLICT`).
+  - Keep proposed SQL outside the Drizzle journal. Lovable owns that journal.
 - **Backup of the SQLite-era app:** branch `backup/phase2-sqlite-2026-10-11` in `MattHimself43/katacoda-scenarios`. Never delete it.
 - **Cost control.** Don't introduce paid services (including paid AI APIs). If more infrastructure is needed, explain the cost and alternatives first.
 
