@@ -13,6 +13,12 @@ The NoirConnects Intelligence app lives in `noirconnects-intelligence/`. Its REA
 | Hostinger | Email provider. |
 
 - **Approval gates.** Don't migrate code or data into Lovable without the owner's explicit approval of the migration plan. Database changes must be non-destructive and tested.
+- **Lovable repository** (`MattHimself43/noirconnects-intelligence`, Lovable syncs `main`):
+  - Work on `claude/…` branches.
+  - **Never merge into `main` without the owner's approval**, because commits on `main` sync straight into the Lovable editor.
+  - Never force-push or rewrite pushed history (see the repo's `AGENTS.md`).
+  - Keep every branch building (`bun run build`, `bun run test`, `bun run lint`).
+- **Backup of the SQLite-era app:** branch `backup/phase2-sqlite-2026-10-11` in `MattHimself43/katacoda-scenarios`. Never delete it.
 - **Cost control.** Don't introduce paid services (including paid AI APIs). If more infrastructure is needed, explain the cost and alternatives first.
 
 ## Standing instructions from the owner
@@ -25,8 +31,8 @@ After completing every development phase or significant update:
 2. Give the owner an interactive preview URL that works on an iPad.
 3. Make sure the owner can navigate the dashboard and test its features. For example, provide sign-in details for a preview-only account.
 4. **Label every link as either a temporary preview or the published (production) application.**
-5. **Never claim a deployment succeeded without verifying it** (for example, by loading the URL and signing in).
-6. If the preview URL changes, provide the updated link.
+5. **Never claim a deployment succeeded without verifying it** (for example, by loading the URL and signing in). Confirm the preview is reachable before sharing it.
+6. Provide the permanent published URL whenever one exists. If a URL changes, provide the updated link.
 7. Do not start the next phase until the owner has reviewed the interface and says to continue.
 
 The owner does not want additional testing reports when asking for a preview. Give the link and how to sign in.
@@ -37,6 +43,12 @@ If the environment cannot host a reachable preview, say so plainly. Point to the
 
 - Admin authentication must be secure, and every dashboard route must be protected.
 - Authorization happens server-side, and the database is protected (RLS on Lovable Cloud).
+- **Every approval workflow is enforced on the server, never only by frontend buttons.** This covers:
+  - discovery niche and settings changes
+  - brand approvals
+  - email sending
+  - creator shortlisting
+  - proposal sending
 - Hostinger credentials live only in server-side secrets.
 - Audit logs are persistent, and every external action requires approval.
 - Never expose private agency information publicly.
