@@ -1,0 +1,20 @@
+{
+  "name": "noirconnects-intelligence",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NoirConnects Intelligence — approval-first influencer marketing intelligence platform",
+  "workspaces": ["server", "web"],
+  "engines": { "node": ">=20.11" },
+  "scripts": {
+    "dev": "concurrently -n api,web -c gray,white \"npm:dev -w server\" \"npm:dev -w web\"",
+    "build": "npm run build -w web && npm run build -w server",
+    "start": "npm run start -w server",
+    "migrate": "npm run migrate -w server",
+    "create-admin": "npm run create-admin -w server",
+    "test": "npm test -w server",
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
