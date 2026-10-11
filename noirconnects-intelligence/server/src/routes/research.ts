@@ -6,6 +6,11 @@ import { commitImport, previewImport, type ImportInput } from '../services/brand
 import { getResearchRunResults, listResearchRuns } from '../services/researchRuns.js';
 import { brandResearchJsonSchema, CSV_COLUMNS } from '../domain/brandResearch.js';
 import { notFound } from '../lib/errors.js';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+// docs/ sits at the project root; this resolves from both src/routes and dist/routes.
+const EXAMPLE_PATH = fileURLToPath(new URL('../../../docs/research/brand-research.example.json', import.meta.url));
 
 const MAX_CONTENT = 4_000_000;
 
@@ -21,6 +26,11 @@ export function researchRoutes(ctx: RouteContext) {
 
   r.get('/brand-schema', requirePermission('dashboard.view'), (_req, res) => {
     res.json({ jsonSchema: brandResearchJsonSchema(), csvColumns: CSV_COLUMNS });
+  });
+
+  // The documented synthetic example (reserved .example domains), for trying the import flow.
+  r.get('/brand-example', requirePermission('research.import'), (_req, res) => {
+    res.json({ fileName: 'brand-research.example.json', content: readFileSync(EXAMPLE_PATH, 'utf8') });
   });
 
   r.post('/brand-imports/preview', requirePermission('research.import'), (req, res) => {

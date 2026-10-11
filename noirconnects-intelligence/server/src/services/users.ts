@@ -144,3 +144,15 @@ export async function resetPassword(db: DB, actor: Actor, userId: number, passwo
     audit(db, actor, { action: 'USER_PASSWORD_RESET', entityType: 'user', entityId: userId, details: { email: user.email } }, now);
   });
 }
+
+/**
+ * Creates the owner from OWNER_EMAIL / OWNER_PASSWORD (/ OWNER_NAME) when the database has
+ * no users. Used on hosts without shell access. Never overwrites an existing account.
+ */
+export async function bootstrapOwnerFromEnv(db: DB, env: NodeJS.ProcessEnv, now: Date): Promise<'created' | 'skipped'> {
+  const email = env.OWNER_EMAIL?.trim();
+  const password = env.OWNER_PASSWORD;
+  if (!email || !password || countUsers(db) > 0) return 'skipped';
+  await createOwner(db, { email, displayName: env.OWNER_NAME?.trim() || email, password }, now);
+  return 'created';
+}

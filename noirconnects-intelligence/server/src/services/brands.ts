@@ -88,6 +88,21 @@ export function listBrandNiches(db: DB): string[] {
   );
 }
 
+/** Brand row as returned by getBrandDetail (all brands columns plus derived fields). */
+export interface BrandDetailRecord {
+  [column: string]: unknown;
+  id: number;
+  name: string;
+  status: string;
+  website_domain: string;
+  discovery_niche: string;
+  settings_version: number;
+  approval_id: string | null;
+  target_markets: string[];
+  quality_breakdown: Record<string, unknown>;
+  warnings: string[];
+}
+
 export function getBrandDetail(db: DB, id: number) {
   const row = db
     .prepare(
@@ -105,13 +120,14 @@ export function getBrandDetail(db: DB, id: number) {
               FROM brand_approvals ba JOIN users u ON u.id = ba.decided_by WHERE ba.brand_id = ? ORDER BY ba.id DESC`)
     .all(id);
   const approval = row.approval_id ? getApproval(db, row.approval_id) : null;
+  const brandView = {
+    ...brand,
+    target_markets: parseJson<string[]>(target_markets_json, []),
+    quality_breakdown: parseJson<Record<string, unknown>>(quality_breakdown_json, {}),
+    warnings: parseJson<string[]>(warnings_json, []),
+  } as BrandDetailRecord;
   return {
-    brand: {
-      ...brand,
-      target_markets: parseJson<string[]>(target_markets_json, []),
-      quality_breakdown: parseJson<Record<string, unknown>>(quality_breakdown_json, {}),
-      warnings: parseJson<string[]>(warnings_json, []),
-    },
+    brand: brandView,
     evidence,
     decisions,
     approval: approval

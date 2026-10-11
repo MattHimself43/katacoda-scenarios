@@ -7,6 +7,8 @@ const projectRoot = resolve(serverRoot, '..');
 export interface AppEnv {
   nodeEnv: string;
   port: number;
+  host: string;
+  trustProxy: boolean;
   databasePath: string;
   cookieSecure: boolean;
   sessionTtlHours: number;
@@ -19,6 +21,9 @@ export function loadEnv(env: NodeJS.ProcessEnv = process.env): AppEnv {
   return {
     nodeEnv: env.NODE_ENV ?? 'development',
     port: Number(env.PORT ?? 4000),
+    // Local default is loopback-only. Hosting platforms set HOST=0.0.0.0.
+    host: env.HOST ?? '127.0.0.1',
+    trustProxy: env.TRUST_PROXY === 'true',
     // Relative paths resolve from the project root so all npm scripts share one database.
     databasePath: dbPath === ':memory:' ? dbPath : resolve(projectRoot, dbPath),
     cookieSecure: env.COOKIE_SECURE === 'true',

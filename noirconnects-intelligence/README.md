@@ -42,7 +42,9 @@ npm run typecheck # server + web
 
 `create-admin` works only while the database has no users. After that, manage the team in the dashboard under **Settings → Team & access**. For non-interactive setup, set `OWNER_EMAIL`, `OWNER_NAME` and `OWNER_PASSWORD`.
 
-The server binds to `127.0.0.1` only. If you serve it over HTTPS behind a reverse proxy, set `COOKIE_SECURE=true`.
+**Preview link on another device (iPad):** see [`docs/deployment.md`](docs/deployment.md). Render's free plan works with the included `render.yaml` blueprint.
+
+The server binds to `127.0.0.1` by default; hosting platforms set `HOST=0.0.0.0` and `TRUST_PROXY=true`. If you serve it over HTTPS behind a reverse proxy, set `COOKIE_SECURE=true`.
 
 ---
 

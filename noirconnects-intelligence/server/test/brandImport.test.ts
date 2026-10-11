@@ -260,3 +260,27 @@ describe('documentation examples', () => {
     expect(c.records[0]!.errors).toEqual([]);
   });
 });
+
+describe('example endpoint and owner bootstrap', () => {
+  it('serves the documented synthetic example to importers', async () => {
+    const r = await loginAs(env.app, 'researcher@example.test');
+    const res = await r.get('/api/research/brand-example');
+    expect(res.status).toBe(200);
+    expect(JSON.parse(res.body.content).schemaVersion).toBe('brand-research/v1');
+    expect((await (await loginAs(env.app, 'viewer@example.test')).get('/api/research/brand-example')).status).toBe(403);
+  });
+
+  it('creates the owner from environment variables only when no users exist', async () => {
+    const { bootstrapOwnerFromEnv } = await import('../src/services/users.js');
+    expect(await bootstrapOwnerFromEnv(env.db, { OWNER_EMAIL: 'other@example.test', OWNER_PASSWORD: 'long-enough-password' }, now())).toBe('skipped');
+    const { initDatabase } = await import('../src/bootstrap.js');
+    const { tempDbPath } = await import('./helpers.js');
+    const tmp = tempDbPath();
+    const db = initDatabase(tmp.path);
+    expect(await bootstrapOwnerFromEnv(db, {}, now())).toBe('skipped');
+    expect(await bootstrapOwnerFromEnv(db, { OWNER_EMAIL: 'owner@example.test', OWNER_PASSWORD: 'long-enough-password', OWNER_NAME: 'Owner' }, now())).toBe('created');
+    expect(await bootstrapOwnerFromEnv(db, { OWNER_EMAIL: 'owner@example.test', OWNER_PASSWORD: 'long-enough-password' }, now())).toBe('skipped');
+    db.close();
+    tmp.cleanup();
+  });
+});

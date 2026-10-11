@@ -87,6 +87,19 @@ export function ImportTab({ onImported }: { onImported: () => void }) {
     setContent(await file.text());
   };
 
+  const loadExample = async () => {
+    try {
+      const ex = await api.get<{ fileName: string; content: string }>('/api/research/brand-example');
+      reset();
+      setResult(null);
+      setFormat('JSON');
+      setFileName(ex.fileName);
+      setContent(ex.content);
+    } catch (e) {
+      setError(errorMessage(e));
+    }
+  };
+
   const preview = async () => {
     setBusy(true);
     reset();
@@ -174,6 +187,7 @@ export function ImportTab({ onImported }: { onImported: () => void }) {
               <Upload className="size-4" aria-hidden /> Choose file
               <input type="file" accept=".json,.csv,application/json,text/csv" className="sr-only" onChange={(e) => void onFile(e)} />
             </label>
+            <Button onClick={() => void loadExample()} title="Synthetic example data with .example domains">Use example file</Button>
             <div className="inline-flex rounded-lg border border-line p-0.5" role="radiogroup" aria-label="Format">
               {(['JSON', 'CSV'] as const).map((f) => (
                 <button
