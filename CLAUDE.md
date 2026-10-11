@@ -14,13 +14,12 @@ The NoirConnects Intelligence app lives in `noirconnects-intelligence/`. Its REA
 
 - **Approval gates.** Don't migrate code or data into Lovable without the owner's explicit approval of the migration plan. Database changes must be non-destructive and tested.
 - **Lovable repository** (`MattHimself43/noirconnects-intelligence`, Lovable syncs `main`):
-  - Work on `claude/…` branches.
-  - **Never merge into `main` without the owner's approval**, because commits on `main` sync straight into the Lovable editor.
+  - **The owner approved pushing tested work directly to `main`** (2026-10-11), so Lovable never needs to switch branches. Commits on `main` sync into the Lovable editor; the published site changes only when the owner clicks Publish.
   - Never force-push or rewrite pushed history (see the repo's `AGENTS.md`).
   - Keep every branch building (`bun run build`, `bun run test`, `bun run lint`).
 - **Database changes on Lovable Cloud** (verified in the pilot):
   - Lovable does not apply migration files pushed from GitHub on its own.
-  - Claude Code writes the SQL, then the owner asks Lovable's chat to "apply `<file>` exactly as written".
+  - Claude Code writes the SQL and pushes it to `main`, then the owner asks Lovable's chat to "apply `<file>` exactly as written". One database change file per phase.
   - Lovable copies the SQL into its own numbered Drizzle migration (`drizzle/migrations/`), applies it, and regenerates `src/integrations/supabase/types.ts`.
   - Write every migration so it can safely run twice (`IF NOT EXISTS`, `ON CONFLICT`).
   - Keep proposed SQL outside the Drizzle journal. Lovable owns that journal.
