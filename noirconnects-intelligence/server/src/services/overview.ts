@@ -55,7 +55,7 @@ export function getOverview(db: DB, now: Date) {
     // Integration status is reported honestly: nothing is shown as connected until verified.
     integrations: {
       mail: { status: 'NOT_CONFIGURED', detail: 'Hostinger Mail integration is built in Phase 3 and not yet connected.' },
-      research: { status: 'NOT_CONFIGURED', detail: 'Research import is built in Phase 2. No scheduled Claude research sync is verified.' },
+      research: { status: 'MANUAL_IMPORT', detail: 'Validated manual JSON/CSV import is available. No scheduled Claude research sync is configured or verified.' },
       scheduler: { status: 'NOT_CONFIGURED', detail: 'Deterministic job scheduler is built in Phase 4.' },
     },
   };

@@ -41,7 +41,7 @@ export function settingsRoutes(ctx: RouteContext) {
       researchScheduling: {
         status: 'NOT_CONFIGURED',
         detail:
-          'No scheduled research is connected. Research results will be imported manually (Phase 2) until a supported, verified scheduled integration exists.',
+          'No scheduled research is connected. Research results are imported manually (Brand Discovery → Import) until a supported, verified scheduled integration exists.',
       },
     });
   });

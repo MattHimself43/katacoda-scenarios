@@ -12,6 +12,8 @@ import type { RouteContext } from './routes/context.js';
 import { authRoutes } from './routes/auth.js';
 import { settingsRoutes } from './routes/settings.js';
 import { approvalRoutes, auditRoutes, overviewRoutes, userRoutes } from './routes/misc.js';
+import { researchRoutes } from './routes/research.js';
+import { brandRoutes } from './routes/brands.js';
 
 export interface AppOptions {
   db: DB;
@@ -44,7 +46,7 @@ export function createApp(opts: AppOptions) {
     );
     next();
   });
-  app.use(express.json({ limit: '2mb' }));
+  app.use(express.json({ limit: '5mb' }));
   app.use(cookieParser());
 
   const api = express.Router();
@@ -65,6 +67,8 @@ export function createApp(opts: AppOptions) {
   api.use('/audit', auditRoutes(ctx));
   api.use('/approvals', approvalRoutes(ctx));
   api.use('/users', userRoutes(ctx));
+  api.use('/research', researchRoutes(ctx));
+  api.use('/brands', brandRoutes(ctx));
   api.use((_req, _res, next) => next(new AppError(404, 'NOT_FOUND', 'Unknown API endpoint')));
   app.use('/api', api);
 

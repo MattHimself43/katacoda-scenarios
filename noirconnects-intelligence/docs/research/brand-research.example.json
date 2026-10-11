@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "brand-research/v1",
+  "configVersion": 1,
+  "niche": "Gaming",
+  "generatedAt": "2026-03-02T08:00:00Z",
+  "producedBy": "Example only — synthetic data, not real companies",
+  "notes": "Illustrates field usage. Every domain uses the reserved .example TLD.",
+  "brands": [
+    {
+      "name": "Northwind Peripherals",
+      "website": "https://www.northwind-peripherals.example",
+      "industry": "Gaming",
+      "subcategory": "Gaming peripherals",
+      "targetMarkets": ["United States", "United Kingdom", "Canada"],
+      "productsServices": "Mechanical keyboards, gaming mice and headsets",
+      "influencerActivitySummary": "Runs sponsored launch campaigns with mid-size Twitch and YouTube creators and operates an ambassador program.",
+      "recommendationReason": "Two disclosed paid sponsorships in the last three months and a public ambassador program.",
+      "researchedAt": "2026-03-01T17:20:00Z",
+      "contactName": { "value": "Jordan Sample", "verified": true },
+      "contactRole": { "value": "Influencer Partnerships Lead", "verified": false },
+      "contactEmail": { "value": "partnerships@northwind-peripherals.example", "verified": true },
+      "contactChannelUrl": "https://northwind-peripherals.example/creators",
+      "evidence": [
+        {
+          "type": "PAID_SPONSORSHIP",
+          "description": "Sponsored keyboard launch segment, disclosed as #ad in the video description.",
+          "sourceUrl": "https://video.example/watch?v=northwind-launch",
+          "date": "2026-01-18",
+          "creatorName": "Example Streamer",
+          "platform": "YouTube",
+          "verified": true
+        },
+        {
+          "type": "AMBASSADOR_PROGRAM",
+          "description": "Public ambassador program page with application form.",
+          "sourceUrl": "https://northwind-peripherals.example/ambassadors",
+          "date": null,
+          "verified": true
+        },
+        {
+          "type": "AFFILIATE_PROGRAM",
+          "description": "Open affiliate program (commission on sales). Not evidence of paid sponsorship.",
+          "sourceUrl": "https://northwind-peripherals.example/affiliates",
+          "date": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "name": "Contoso Seating",
+      "website": "contoso-seating.example",
+      "industry": "Gaming",
+      "subcategory": "Gaming chairs and furniture",
+      "targetMarkets": ["Global"],
+      "productsServices": "Ergonomic gaming chairs and desks",
+      "influencerActivitySummary": "Creator setup tours feature the product; sponsorship status of some posts is unclear.",
+      "recommendationReason": "Recent creator announcement; contact route is the official partnership form only.",
+      "contactChannelUrl": "https://contoso-seating.example/partner-with-us",
+      "evidence": [
+        {
+          "type": "CREATOR_ANNOUNCEMENT",
+          "description": "Creator announced a partnership with the brand on social media.",
+          "sourceUrl": "https://social.example/post/contoso-partnership",
+          "date": "2026-02",
+          "platform": "X",
+          "verified": false
+        }
+      ]
+    }
+  ]
+}
