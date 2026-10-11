@@ -78,19 +78,30 @@ export function getActiveSettings(db: DB): ActiveSettings {
   return { versionId, version: v.version, config, configHash: v.config_hash, createdAt: v.created_at, approvedBy: v.approved_by, notes: v.notes };
 }
 
-export function listVersions(db: DB) {
-  return (
-    db
-      .prepare(
-        `SELECT sv.id, sv.version, sv.config_json, sv.config_hash, sv.change_request_id, sv.created_at, sv.notes,
-                cu.display_name AS requested_by, au.display_name AS approved_by
-         FROM settings_versions sv
-         LEFT JOIN users cu ON cu.id = sv.created_by
-         LEFT JOIN users au ON au.id = sv.approved_by
-         ORDER BY sv.version DESC`,
-      )
-      .all() as Array<Record<string, unknown> & { config_json: string }>
-  ).map(({ config_json, ...r }) => ({ ...r, config: JSON.parse(config_json) as IntelligenceConfig }));
+export interface SettingsVersionView {
+  id: number;
+  version: number;
+  config: IntelligenceConfig;
+  config_hash: string;
+  change_request_id: number | null;
+  created_at: string;
+  notes: string | null;
+  requested_by: string | null;
+  approved_by: string | null;
+}
+
+export function listVersions(db: DB): SettingsVersionView[] {
+  const rows = db
+    .prepare(
+      `SELECT sv.id, sv.version, sv.config_json, sv.config_hash, sv.change_request_id, sv.created_at, sv.notes,
+              cu.display_name AS requested_by, au.display_name AS approved_by
+       FROM settings_versions sv
+       LEFT JOIN users cu ON cu.id = sv.created_by
+       LEFT JOIN users au ON au.id = sv.approved_by
+       ORDER BY sv.version DESC`,
+    )
+    .all() as Array<Omit<SettingsVersionView, 'config'> & { config_json: string }>;
+  return rows.map(({ config_json, ...r }) => ({ ...r, config: JSON.parse(config_json) as IntelligenceConfig }));
 }
 
 export interface ChangeRequestView {

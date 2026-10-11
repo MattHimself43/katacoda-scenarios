@@ -8,6 +8,7 @@ import { permissionsFor } from '../auth/permissions.js';
 import { audit } from '../services/audit.js';
 import { unauthorized, AppError } from '../lib/errors.js';
 import { tx } from '../db/connection.js';
+import type { Role } from '../domain/statuses.js';
 
 const loginSchema = z.object({ email: z.string().trim().email().max(254), password: z.string().min(1).max(256) });
 
@@ -38,7 +39,8 @@ export function authRoutes(ctx: RouteContext) {
     const session = tx(ctx.db, () => {
       const s = createSession(ctx.db, user.id, now, ctx.sessionTtlHours, { ip: req.ip, userAgent: req.get('user-agent') });
       ctx.db.prepare('UPDATE users SET last_login_at = ? WHERE id = ?').run(now.toISOString(), user.id);
-      audit(ctx.db, 'SYSTEM', { action: 'LOGIN_SUCCEEDED', entityType: 'user', entityId: user.id, details: { email, ip: req.ip } }, now);
+      const role = (ctx.db.prepare('SELECT r.name FROM users u JOIN roles r ON r.id = u.role_id WHERE u.id = ?').get(user.id) as { name: Role }).name;
+      audit(ctx.db, { userId: user.id, email, displayName: email, role, isOwner: false, ip: req.ip }, { action: 'LOGIN_SUCCEEDED', entityType: 'user', entityId: user.id }, now);
       return s;
     });
     res.cookie(SESSION_COOKIE, session.token, {

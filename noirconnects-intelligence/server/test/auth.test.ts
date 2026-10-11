@@ -74,3 +74,17 @@ describe('authentication', () => {
     expect(relogin.status).toBe(401);
   });
 });
+
+describe('authentication audit trail', () => {
+  it('attributes successful logins to the user and failed logins to the system', async () => {
+    await loginAs(env.app, 'manager@example.test');
+    await request(env.app).post('/api/auth/login').set('X-Requested-With', 'NoirConnects').send({ email: 'manager@example.test', password: 'wrong-password-xx' });
+    const rows = env.db
+      .prepare(`SELECT action, actor_type, actor_user_id FROM audit_logs WHERE action LIKE 'LOGIN_%' ORDER BY id`)
+      .all() as { action: string; actor_type: string; actor_user_id: number | null }[];
+    expect(rows).toEqual([
+      { action: 'LOGIN_SUCCEEDED', actor_type: 'USER', actor_user_id: env.users.manager.userId },
+      { action: 'LOGIN_FAILED', actor_type: 'SYSTEM', actor_user_id: null },
+    ]);
+  });
+});
