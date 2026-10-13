@@ -1,0 +1,33 @@
+# Render Blueprint for a NoirConnects Intelligence preview (free plan).
+# Free web services have an ephemeral filesystem: the SQLite database resets on every
+# redeploy, restart or spin-down. Use this for interface review, not real operations.
+# See noirconnects-intelligence/docs/deployment.md.
+services:
+  - type: web
+    name: noirconnects-intelligence
+    runtime: node
+    plan: free
+    rootDir: noirconnects-intelligence
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: HOST
+        value: 0.0.0.0
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: TRUST_PROXY
+        value: "true"
+      - key: DATABASE_PATH
+        value: ./data/noirconnects.db
+      # Owner account, created on startup when the database is empty. Entered in the
+      # Render dashboard; never committed. Password: at least 12 characters.
+      - key: OWNER_EMAIL
+        sync: false
+      - key: OWNER_NAME
+        sync: false
+      - key: OWNER_PASSWORD
+        sync: false
